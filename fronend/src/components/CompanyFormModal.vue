@@ -1,10 +1,9 @@
 <script setup>
-import {onMounted, ref, watch} from 'vue'
+import {ref, watch} from 'vue'
 import {
   Dialog,
   DialogPanel,
   DialogTitle,
-  DialogDescription,
   TransitionRoot,
   TransitionChild
 } from '@headlessui/vue'
