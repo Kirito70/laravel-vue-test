@@ -3,6 +3,7 @@ import axios from "axios";
 import {onMounted, ref} from "vue";
 import DataTable from "@/components/DataTable.vue";
 import EmployeeFormModal from "@/components/EmployeeFormModal.vue";
+import DeletePopup from "@/components/DeletePopup.vue";
 
 const employees = ref([])
 const openDialog = ref(false)
@@ -43,6 +44,20 @@ const config = ref({
   pkey: 'id'
 })
 
+const openDeleteDialog = ref(false)
+const employeeDeleteUrl = ref('')
+
+const closeDeleteModal = () => {
+  openDeleteDialog.value = false
+  employeeDeleteUrl.value = ''
+  getEmployees()
+}
+
+const deleteEmployee = (company) => {
+  employeeDeleteUrl.value = `employees/${company.id}`
+  openDeleteDialog.value = true
+}
+
 const getEmployees = (page = 1) => {
   axios.get("/employees", {
     params: {
@@ -59,11 +74,7 @@ const closeModal = () => {
   getEmployees()
 }
 
-const deleteEmployee = () => {
-
-}
-
-const editCompany = (employee) => {
+const editEmployee = (employee) => {
   employeeEdited.value = employee
   openDialog.value = true
 }
@@ -92,12 +103,12 @@ onMounted(() => {
         :pagination="employees.meta"
         @page-change="getEmployees"
         @on-delete="deleteEmployee"
-        @on-edit="editCompany"
+        @on-edit="editEmployee"
     />
 
     <employee-form-modal :is-open="openDialog" @close="closeModal" :employee="employeeEdited"/>
 
-
+    <delete-popup :is-open="openDeleteDialog" :url="employeeDeleteUrl" @close="closeDeleteModal"/>
   </div>
 </template>
 

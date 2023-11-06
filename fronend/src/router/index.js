@@ -1,6 +1,6 @@
 import {createRouter, createWebHistory} from 'vue-router'
 import LoginUser from "@/views/LoginUser.vue";
-import EmployeeTable from "@/views/Employees/EmployeeTable.vue";
+import EmployeeTable from "@/views/Employees/EmployeeList.vue";
 import CompanyList from "@/views/Companies/CompanyList.vue";
 import PageLayout from "@/views/Layout/PageLayout.vue";
 

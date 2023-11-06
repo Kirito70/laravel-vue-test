@@ -3,10 +3,13 @@ import axios from "axios";
 import {onMounted, ref} from "vue";
 import DataTable from "@/components/DataTable.vue";
 import CompanyFormModal from "@/components/CompanyFormModal.vue";
+import DeletePopup from "@/components/DeletePopup.vue";
 
 const companies = ref([])
 const openDialog = ref(false)
+const openDeleteDialog = ref(false)
 const companyEdited = ref(null)
+const companyDeleteUrl = ref('')
 const config = ref({
   columns: [
     {
@@ -54,8 +57,15 @@ const closeModal = () => {
   getCompanies()
 }
 
-const deleteCompany = () => {
+const closeDeleteModal = () => {
+  openDeleteDialog.value = false
+  companyDeleteUrl.value = ''
+  getCompanies()
+}
 
+const deleteCompany = (company) => {
+  companyDeleteUrl.value = `companies/${company.id}`
+  openDeleteDialog.value = true
 }
 
 const editCompany = (company) => {
@@ -92,6 +102,8 @@ onMounted(() => {
     />
 
     <company-form-modal :is-open="openDialog" @close="closeModal" :company="companyEdited"/>
+
+    <delete-popup :is-open="openDeleteDialog" :url="companyDeleteUrl" @close="closeDeleteModal"/>
 
 
   </div>

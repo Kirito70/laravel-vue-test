@@ -32,7 +32,7 @@ class EmployeePostRequest extends FormRequest
                 'required'
             ],
             'email' => [
-                'nullable',
+                'required',
                 'email',
                 Rule::unique('employees', 'email')
             ],

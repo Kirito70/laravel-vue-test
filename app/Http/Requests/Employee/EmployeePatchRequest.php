@@ -32,7 +32,7 @@ class EmployeePatchRequest extends FormRequest
                 'required'
             ],
             'email' => [
-                'required',
+                'nullable',
                 'email',
                 Rule::unique('employees', 'email')
                 ->ignore(
