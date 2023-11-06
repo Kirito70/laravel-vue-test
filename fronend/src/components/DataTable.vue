@@ -45,7 +45,7 @@
 
       <td class="tw-py-2 tw-text-center">
         <button class="tw-p-2">
-          <i class="fa-solid fa-pencil" />
+          <i class="fa-solid fa-pencil" />one
         </button>
         <button class="tw-p-2 tw-text-red-700">
           <i class="fa-solid fa-trash-alt" />
