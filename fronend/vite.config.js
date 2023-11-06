@@ -14,6 +14,7 @@ export default defineConfig({
     }
   },
   optimizeDeps: [
-      '@headlessui/vue'
+      '@headlessui/vue',
+      "@heroicons/vue"
   ]
 })

@@ -1,105 +1,103 @@
 <script setup>
-import {TrashIcon, PencilIcon, EyeIcon} from "@heroicons/vue/20/solid";
 import axios from "axios";
-import {onMounted} from "vue";
-const employee_table = [
-  {
-    id : "1",
-    first_name:"fn",
-    last_name:"un",
-    company:"company name",
-    email:"e@gmail.com",
-    phone:"093429"
-  },
+import {onMounted, ref} from "vue";
+import DataTable from "@/components/DataTable.vue";
+import EmployeeFormModal from "@/components/EmployeeFormModal.vue";
+
+const employees = ref([])
+const openDialog = ref(false)
+const employeeEdited = ref(null)
+const config = ref({
+  columns: [
     {
-    id : "2",
-    first_name:"fn",
-    last_name:"un",
-    company:"company name",
-    email:"e@gmail.com",
-    phone:"093429"
-  },
+      name: 'id',
+      label: 'Id',
+      type: 'text'
+    },
     {
-    id : "3",
-    first_name:"fn",
-    last_name:"un",
-    company:"company name",
-    email:"e@gmail.com",
-    phone:"093429"
-  },
+      name: 'first_name',
+      label: 'First Name',
+      type: 'text'
+    },
     {
-    id : "4",
-    first_name:"fn",
-    last_name:"un",
-    company:"company name",
-    email:"e@gmail.com",
-    phone:"093429"
-  },{
-    id : "5",
-    first_name:"fn",
-    last_name:"un",
-    company:"company name",
-    email:"e@gmail.com",
-    phone:"093429"
-  },{
-    id : "6",
-    first_name:"fn",
-    last_name:"un",
-    company:"company name",
-    email:"e@gmail.com",
-    phone:"093429"
-  }
+      name: 'last_name',
+      label: 'Last Name',
+      type: 'text'
+    },
+    {
+      name: 'email',
+      label: 'Email',
+      type: 'text'
+    },
+    {
+      name: 'company',
+      label: 'Company',
+      type: 'text'
+    },
+    {
+      name: 'phone',
+      label: 'Phone',
+      type: 'text'
+    }
+  ],
+  pkey: 'id'
+})
 
-
-
-]
-
-const employee_list =()=> {
-  axios.get("/employees").then((response)=>{
-    console.log(response)
+const getEmployees = (page = 1) => {
+  axios.get("/employees", {
+    params: {
+      page
+    }
+  }).then((response) => {
+    employees.value = response.data
   })
 }
-onMounted(()=>{
-  employee_list()
+
+const closeModal = () => {
+  openDialog.value = false
+  employeeEdited.value = null
+  getEmployees()
+}
+
+const deleteEmployee = () => {
+
+}
+
+const editCompany = (employee) => {
+  employeeEdited.value = employee
+  openDialog.value = true
+}
+
+onMounted(() => {
+  getEmployees()
 })
 </script>
 
 <template>
-    <div class="group block mx-auto shadow-lg border m-4 mt-5 p-5 rounded-2xl ">
+  <div class="tw tw-block tw-mx-auto tw-shadow-lg tw-border tw-m-4 tw-mt-5 tw-p-5 tw-rounded-2xl ">
+    <div class="tw-bg-blue-900  tw-rounded-t-2xl tw-p-4">
+      <div class=" tw-p-2 tw-flex tw-justify-between">
+        <h1 class=" tw-text-xl tw-text-white tw-font-bold">Employees</h1>
 
-    <div  class="flex bg-blue-900 p-3 rounded-t-2xl justify-between" >
-        <div class="p-2 ">
-          <h1 class=" text-xl text-white font-bold">Employee </h1>
-        </div>
-         <div>
-           <router-link to="/addemployee">
-          <button class="addButton text-white  bg-cyan-600 text-white p-2 hover:bg-cyan-700  rounded-xl p-2 px-5 ">Add</button>
-          </router-link>
-         </div>
+        <button class="tw-p-2 tw-text-white tw-bg-green-700 tw-" @click="openDialog = true">
+          <i class="fa-solid fa-plus-circle"/>
+          Add Employee
+        </button>
       </div>
+    </div>
+
+    <data-table
+        :config="config"
+        :data="employees.data"
+        :pagination="employees.meta"
+        @page-change="getEmployees"
+        @on-delete="deleteEmployee"
+        @on-edit="editCompany"
+    />
+
+    <employee-form-modal :is-open="openDialog" @close="closeModal" :employee="employeeEdited"/>
 
 
-    <table class="tw-table-auto tw-w-full">
-      <thead class="tw-bg-blue-100">
-        <tr>
-          <th v-for="list in employee_table">
-            {{key}}
-          </th>
-          <th>Actions</th>
-       </tr>
-
-
-        <tr class="tw-text-center">
-          <td class="tw-py-2">001</td>
-          <td class="actionIcons tw-flex tw-py-2 ">
-            <EyeIcon class="tw-mx-3 tw-h-7 tw-w-5"></EyeIcon>
-            <PencilIcon class="tw-mx-3 tw=h-7 tw-w-5"></PencilIcon>
-            <TrashIcon class="tw-mx-3 tw-h-7 tw-w-5"></TrashIcon>
-          </td>
-        </tr>
-      </thead>
-
-    </table>
   </div>
 </template>
 

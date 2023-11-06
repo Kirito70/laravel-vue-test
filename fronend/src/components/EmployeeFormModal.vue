@@ -1,12 +1,18 @@
 <script setup>
-import {ref, watch} from 'vue'
+import {onMounted, ref, watch} from 'vue'
 import {
   Dialog,
   DialogPanel,
   DialogTitle,
   TransitionRoot,
-  TransitionChild
+  TransitionChild,
+  Listbox,
+  ListboxButton,
+  ListboxOptions,
+  ListboxOption
 } from '@headlessui/vue'
+
+import {CheckIcon, ChevronUpDownIcon} from '@heroicons/vue/20/solid'
 import InputErrorMessage from "@/components/InputErrorMessage/InputErrorMessage.vue";
 
 const props = defineProps({
@@ -18,8 +24,13 @@ const props = defineProps({
   }
 })
 
+const companies = ref([])
+
 const errors = ref({})
 const loading = ref(false)
+const selectedCompany = ref({
+  name: "Select Company"
+})
 const data = ref({
   first_name: '',
   last_name: '',
@@ -59,9 +70,11 @@ const createEmployee = () => {
   let formData = new FormData()
 
   Object.keys(data.value).forEach(key => {
-    console.log(key)
     formData.append(key, data.value[key])
   })
+
+  console.log(selectedCompany)
+  formData.append('company_id', selectedCompany.value.id)
 
   axios.post(url, formData).then(response => {
     emits('close')
@@ -73,17 +86,25 @@ const createEmployee = () => {
 
 const resetForm = () => {
   data.value = {
-    name: '',
+    first_name: '',
+    last_name: '',
     email: '',
-    logo: '',
-    website: ''
+    website: '',
+    company_id: '',
   }
   errors.value = {}
 }
 
-const fileSelected = (event) => {
-  data.value.logo = event.target.files[0]
+const getCompanies = () => {
+  axios.get('companies/companies-select').then(response => {
+    companies.value = response.data.data
+  }).catch(error => {
+  })
 }
+
+onMounted(() => {
+  getCompanies()
+})
 
 </script>
 
@@ -120,7 +141,8 @@ const fileSelected = (event) => {
               <DialogTitle
                   as="h3"
                   class="tw-text-lg tw-font-medium tw-leading-6 tw-text-gray-900"
-              >{{ `${employee ? "Edit" : "Create"} Employee` }}</DialogTitle>
+              >{{ `${employee ? "Edit" : "Create"} Employee` }}
+              </DialogTitle>
 
               <div class="tew-mt-3">
                 <form @submit.prevent="createEmployee" enctype="multipart/form-data">
@@ -146,6 +168,68 @@ const fileSelected = (event) => {
                              placeholder="Employee Email" v-model="data.email"/>
                       <InputErrorMessage :errors="errors.email"/>
                     </div>
+                    <div class="tw-mb-4" v-if="companies.length">
+                      <label for="email" class="tw-mt-5">Employee Company</label>
+                      <Listbox v-model="selectedCompany">
+                        <div class="tw-relative tw-mt-1">
+                          <ListboxButton
+                              class="tw-relative tw-w-full tw-cursor-default tw-rounded-lg tw-bg-white tw-py-2 pl-3 pr-10 tw-text-left tw-shadow-md focus:tw-outline-none focus-visible:tw-border-indigo-500 focus-visible:tw-ring-2 focus-visible:tw-ring-white/75 focus-visible:tw-ring-offset-2 focus-visible:tw-ring-offset-orange-300 sm:tw-text-sm"
+                          >
+                            <span class="tw-block tw-truncate">{{ selectedCompany.name }}</span>
+                            <span
+                                class="tw-pointer-events-none tw-absolute tw-inset-y-0 tw-right-0 tw-flex tw-items-center tw-pr-2"
+                            >
+                            <ChevronUpDownIcon
+                                class="tw-h-5 tw-w-5 tw-text-gray-400"
+                                aria-hidden="true"
+                            />
+                          </span>
+                          </ListboxButton>
+
+                          <transition
+                              leave-active-class="tw-transition tw-duration-100 tw-ease-in"
+                              leave-from-class="tw-opacity-100"
+                              leave-to-class="tw-opacity-0"
+                          >
+                            <ListboxOptions
+                                class="tw-absolute tw-mt-1 tw-max-h-60 tw-w-full tw-overflow-auto tw-rounded-md tw-bg-white tw-py-1 tw-text-base tw-shadow-lg tw-ring-1 tw-ring-black/5 focus:tw-outline-none sm:tw-text-sm"
+                            >
+                              <ListboxOption
+                                  v-slot="{ active, selected }"
+                                  v-for="company in companies"
+                                  :key="company.id"
+                                  :value="company"
+                                  as="template"
+                              >
+                                <li
+                                    :class="[
+                                      active ? 'tw-bg-amber-100 tw-text-amber-900' : 'tw-text-gray-900',
+                                      'tw-relative tw-cursor-default tw-select-none tw-py-2 tw-pl-10 tw-pr-4',
+                                    ]"
+                                >
+                                <span
+                                    :class="[
+                                    selected ? 'tw-font-medium' : 'tw-font-normal',
+                                    'tw-block tw-truncate',
+                                  ]"
+                                >
+                                  {{ company.name }}
+                                </span>
+                                  <span
+                                      v-if="selected"
+                                      class="tw-absolute tw-inset-y-0 tw-left-0 tw-flex tw-items-center tw-pl-3 tw-text-amber-600"
+                                  >
+                                  <CheckIcon class="tw-h-5 tw-w-5" aria-hidden="true"/>
+                                  </span>
+                                </li>
+                              </ListboxOption>
+                            </ListboxOptions>
+
+                          </transition>
+                        </div>
+                      </Listbox>
+                      <InputErrorMessage :errors="errors.compnay_id"/>
+                    </div>
                     <div class="tw-mb-4">
                       <label for="phone" class="mt-5">Employee Website</label>
                       <input type="text" name="phone" placeholder="Phone"
@@ -161,17 +245,20 @@ const fileSelected = (event) => {
                 <button
                     type="button"
                     class="tw-inline-flex tw-justify-center tw-rounded-md tw-border tw-border-transparent tw-bg-red-100 tw-px-4 tw-py-2 tw-text-sm tw-font-medium tw-text-blue-900 hover:tw-bg-blue-200 focus:tw-outline-none focus-visible:tw-ring-2 focus-visible:tw-ring-blue-500 focus-visible:tw-ring-offset-2"
-                    @click="close" >Cancel</button>
+                    @click="close">Cancel
+                </button>
                 <button
                     class="tw-inline-flex tw-justify-center tw-rounded-md tw-border tw-border-transparent tw-bg-green-100 tw-px-4 tw-py-2 tw-text-sm tw-font-medium tw-text-blue-900 hover:tw-bg-blue-200 focus:tw-outline-none focus-visible:tw-ring-2 focus-visible:tw-ring-blue-500 focus-visible:tw-ring-offset-2"
                     type="button"
                     @click="createEmployee"
-                    :loading="loading" :disabled="loading"> {{ loading ? "Creating Employee..." :  `${employee ? "Edit" : "Create"} Employee` }}
+                    :loading="loading" :disabled="loading">
+                  {{ loading ? "Creating Employee..." : `${employee ? "Edit" : "Create"} Employee` }}
                 </button>
               </div>
             </DialogPanel>
           </TransitionChild>
-        </div>`
+        </div>
+        `
       </div>
     </Dialog>
   </TransitionRoot>

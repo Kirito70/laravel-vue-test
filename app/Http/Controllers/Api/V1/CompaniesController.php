@@ -98,4 +98,9 @@ class CompaniesController extends Controller
             $status ? Response::HTTP_OK : Response::HTTP_BAD_REQUEST
         );
     }
+
+    public function companiesSelect()
+    {
+        return CompanyResource::collection(Company::all());
+    }
 }

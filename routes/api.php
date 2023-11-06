@@ -21,6 +21,7 @@ use Illuminate\Support\Facades\Route;
 Route::middleware(['auth:sanctum'])
     ->prefix('v1')
     ->group(function () {
+        Route::get('companies/companies-select', [\App\Http\Controllers\Api\V1\CompaniesController::class, 'companiesSelect']);
         Route::apiResource('companies', \App\Http\Controllers\Api\V1\CompaniesController::class);
         Route::apiResource('employees', \App\Http\Controllers\Api\V1\EmployeesController::class);
     });
