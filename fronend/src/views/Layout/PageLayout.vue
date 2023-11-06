@@ -1,27 +1,17 @@
 <script setup>
 
-import CompanyTable from "@/views/Companies/CompanyTable.vue";
-import EmployeeTable from "@/views/Employees/EmployeeTable.vue";
 import {ref} from "vue";
 
-const isActive = ref(false)
 </script>
 
 <template>
-   <div class="tw-mr-10">
-      <nav class="tw-flex tw-justify-end tw-py-2">
-      <ul class="tw-font-semibold tw-flex tw-gap-2 ">
-        <li class="tw-border tw-border-black tw-px-4 tw-py-1 tw-rounded-[4px] hover:tw-bg-gray-200">
-          <router-link to="/dashboard/employee-list" @click="isActive=false">Employees</router-link>
-        </li>
-        <li class="tw-border tw-border-black tw-px-4 tw-py-1 tw-rounded-[4px]  hover:tw-bg-gray-200">
-          <router-link to="/dashboard/company-list" @click="isActive=true">Companies</router-link>
-        </li>
-      </ul>
+  <header class="tw-bg-white">
+    <nav class="tw-mx-auto tw-flex tw-max-w-7xl tw-items-center tw-justify-between tw-p-6 lg:tw-px-8" aria-label="Global">
+      <router-link :to="{name: 'companies'}" class="tw-text-sm tw-font-semibold tw-leading-6 tw-text-gray-900">Companies</router-link>
+      <router-link :to="{name: 'employees'}" class="tw-text-sm tw-font-semibold tw-leading-6 tw-text-gray-900">Employees</router-link>
     </nav>
-   </div>
-   <CompanyTable v-if="isActive"/>
-  <EmployeeTable v-else />
+  </header>
+  <router-view/>
 </template>
 
 <style scoped>

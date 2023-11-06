@@ -1,7 +1,7 @@
 import {createRouter, createWebHistory} from 'vue-router'
 import LoginUser from "@/views/LoginUser.vue";
 import EmployeeTable from "@/views/Employees/EmployeeTable.vue";
-import CompanyTable from "@/views/Companies/CompanyTable.vue";
+import CompanyList from "@/views/Companies/CompanyList.vue";
 import PageLayout from "@/views/Layout/PageLayout.vue";
 
 const router = createRouter({
@@ -18,14 +18,14 @@ const router = createRouter({
             component: PageLayout,
             children: [
                 {
-                    path: '/dashboard/employee-list',
-                    name: 'employee',
+                    path: 'employee-list',
+                    name: 'employees',
                     component: EmployeeTable
                 },
                 {
-                    path: '/dashboard/company-list',
+                    path: 'company-list',
                     name: 'companies',
-                    component: CompanyTable
+                    component: CompanyList
                 }
             ]
         },

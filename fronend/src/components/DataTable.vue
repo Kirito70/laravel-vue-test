@@ -33,7 +33,9 @@
     <tr v-for="(row,index) in data" :key="`row-${index}`">
       <td v-for="col in config.columns" class="tw-py-2 tw-text-center">
         <template v-if="col.type == 'image'">
-          <img v-if="row[col.name]" class="tw-h-[100px] tw-w-[100px] tw-rounded-lg tw-text-center" alt="logo" :src="row[col.name]">
+          <div v-if="row[col.name]" class="tw-justify-center tw-flex tw-w-full">
+            <img class=" tw-h-[50px] tw-w-[50px] tw-rounded-[50%] tw-text-center" alt="logo" :src="row[col.name]">
+          </div>
           <p v-else>-</p>
         </template>
         <template v-else>

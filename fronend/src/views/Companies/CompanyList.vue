@@ -2,8 +2,10 @@
 import axios from "axios";
 import {onMounted, ref} from "vue";
 import DataTable from "@/components/DataTable.vue";
+import CompanyFormModal from "@/components/CompanyFormModal.vue";
 
 const companies = ref([])
+const openDialog = ref(false)
 const config = ref({
   columns: [
     {
@@ -65,7 +67,7 @@ onMounted(() => {
       <div class=" tw-p-2 tw-flex tw-justify-between">
         <h1 class=" tw-text-xl tw-text-white tw-font-bold">Company</h1>
 
-        <button class="tw-p-2 tw-text-white tw-bg-green-700">
+        <button class="tw-p-2 tw-text-white tw-bg-green-700 tw-" @click="openDialog = true">
           <i class="fa-solid fa-plus-circle"/>
           Add Company
         </button>
@@ -80,6 +82,8 @@ onMounted(() => {
         @on-delete="delete_company"
         @on-edit="edit_company"
     />
+
+    <company-form-modal :is-open="openDialog"/>
 
 
   </div>
