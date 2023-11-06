@@ -13,7 +13,7 @@
     }
   })
 
-  const emit = defineEmits(['pageChange'])
+  const emit = defineEmits(['pageChange', 'onEdit', 'onDelete'])
 
   const pageChanged = (page) => {
     emit('pageChange', page)
@@ -44,10 +44,10 @@
       </td>
 
       <td class="tw-py-2 tw-text-center">
-        <button class="tw-p-2">
-          <i class="fa-solid fa-pencil" />one
+        <button class="tw-p-2" @click="$emit('onEdit', row)">
+          <i class="fa-solid fa-pencil" />
         </button>
-        <button class="tw-p-2 tw-text-red-700">
+        <button class="tw-p-2 tw-text-red-700" @click="$emit('onDelete', row)">
           <i class="fa-solid fa-trash-alt" />
         </button>
       </td>

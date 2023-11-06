@@ -39,7 +39,7 @@ class CompanyPostRequest extends FormRequest
                 'required'
             ],
             'email' => [
-                'nullable',
+                'required',
                 'email',
                 Rule::unique('companies', 'email')
             ],

@@ -1,5 +1,5 @@
 <script setup>
-import {ref} from 'vue'
+import {onMounted, ref, watch} from 'vue'
 import {
   Dialog,
   DialogPanel,
@@ -14,9 +14,8 @@ const props = defineProps({
   isOpen: {
     required: true
   },
-  isEdit: {
-    required: false,
-    default: false
+  company: {
+    required: false
   }
 })
 
@@ -33,12 +32,59 @@ const emits = defineEmits([
   'close'
 ])
 
+watch(() => props.isOpen, (old, newValue) => {
+  if (props.company) {
+    data.value.name = props.company.name
+    data.value.email = props.company.email
+    data.value.website = props.company.website
+  }
+})
+
 function close() {
   emits('close')
 }
 
 const createCompany = () => {
+  errors.value = {}
+  let url = '/companies'
 
+  if (props.company) {
+    url += '/' + props.company.id
+
+    data.value['_method'] = 'PATCH'
+  }
+
+  let formData = new FormData()
+
+  Object.keys(data.value).forEach(key => {
+    console.log(key)
+    formData.append(key, data.value[key])
+  })
+
+  axios.post(url, formData, {
+    headers: {
+      "Content-Type": ""
+    }
+  }).then(response => {
+    emits('close')
+    resetForm()
+  }).catch(error => {
+    errors.value = error.response.data.errors
+  })
+}
+
+const resetForm = () => {
+  data.value = {
+    name: '',
+    email: '',
+    logo: '',
+    website: ''
+  }
+  errors.value = {}
+}
+
+const fileSelected = (event) => {
+  data.value.logo = event.target.files[0]
 }
 
 </script>
@@ -76,10 +122,10 @@ const createCompany = () => {
               <DialogTitle
                   as="h3"
                   class="tw-text-lg tw-font-medium tw-leading-6 tw-text-gray-900"
-              >{{ `${isEdit ? "Edit" : "Create"} Company` }}</DialogTitle>
+              >{{ `${company ? "Edit" : "Create"} Company` }}</DialogTitle>
 
-              <div class="tew-mt-2">
-                <form @submit.prevent="createCompany">
+              <div class="tew-mt-3">
+                <form @submit.prevent="createCompany" enctype="multipart/form-data">
                   <div class="tw-p-4">
                     <div class="tw-mb-4">
                       <label for="email" class="tw-mt-5">Company name</label>
@@ -97,25 +143,34 @@ const createCompany = () => {
                     </div>
                     <div class="tw-mb-4">
                       <label for="password" class="mt-5">Company Website</label>
-                      <input required type="text" name="website" placeholder="website"
+                      <input type="text" name="website" placeholder="website"
                              class="tw-mt-1 tw-px-3 tw-py-2  tw-border tw-shadow-sm tw-border-slate-300 tw-placeholder-slate-400 tw-focus:outline-none tw-focus:border-sky-500 tw-focus:ring-sky-500 tw-block tw-w-full tw-rounded-md sm:tw-text-sm focus:tw-ring-1"
                              v-model="data.website"/>
-                      <InputErrorMessage :errors="errors.password"/>
+                      <InputErrorMessage :errors="errors.website"/>
+                    </div>
+                    <div class="tw-mb-4">
+                      <label for="password" class="mt-5">Company Logo</label>
+                      <input type="file" name="logo" placeholder="Company logo"
+                             @input="fileSelected"
+                             class="tw-mt-1 tw-px-3 tw-py-2  tw-border tw-shadow-sm tw-border-slate-300 tw-placeholder-slate-400 tw-focus:outline-none tw-focus:border-sky-500 tw-focus:ring-sky-500 tw-block tw-w-full tw-rounded-md sm:tw-text-sm focus:tw-ring-1"
+                      />
+                      <InputErrorMessage :errors="errors.logo"/>
                     </div>
                   </div>
                 </form>
               </div>
 
-              <div class="tw-mt-4">
-                <button
-                    class=" tw-text-black tw-border tw-border-gray-600 tw-py-1 hover:tw-bg-black hover:tw-text-white tw-rounded-full tw-px-8 tw-m-2"
-                    type="button"
-                    :loading="loading" :disabled="loading"> {{ loading ? "Creating Company..." : "Create Company" }}
-                </button>
+              <div class="tw-mt-3 tw-flex tw-justify-between">
                 <button
                     type="button"
                     class="tw-inline-flex tw-justify-center tw-rounded-md tw-border tw-border-transparent tw-bg-red-100 tw-px-4 tw-py-2 tw-text-sm tw-font-medium tw-text-blue-900 hover:tw-bg-blue-200 focus:tw-outline-none focus-visible:tw-ring-2 focus-visible:tw-ring-blue-500 focus-visible:tw-ring-offset-2"
                     @click="close" >Cancel</button>
+                <button
+                    class="tw-inline-flex tw-justify-center tw-rounded-md tw-border tw-border-transparent tw-bg-green-100 tw-px-4 tw-py-2 tw-text-sm tw-font-medium tw-text-blue-900 hover:tw-bg-blue-200 focus:tw-outline-none focus-visible:tw-ring-2 focus-visible:tw-ring-blue-500 focus-visible:tw-ring-offset-2"
+                    type="button"
+                    @click="createCompany"
+                    :loading="loading" :disabled="loading"> {{ loading ? "Creating Company..." :  `${company ? "Edit" : "Create"} Company` }}
+                </button>
               </div>
             </DialogPanel>
           </TransitionChild>

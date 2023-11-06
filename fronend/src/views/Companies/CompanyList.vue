@@ -6,6 +6,7 @@ import CompanyFormModal from "@/components/CompanyFormModal.vue";
 
 const companies = ref([])
 const openDialog = ref(false)
+const companyEdited = ref(null)
 const config = ref({
   columns: [
     {
@@ -37,7 +38,7 @@ const config = ref({
   pkey: 'id'
 })
 
-const company_list = (page = 1) => {
+const getCompanies = (page = 1) => {
   axios.get("/companies", {
     params: {
       page
@@ -47,16 +48,23 @@ const company_list = (page = 1) => {
   })
 }
 
-const delete_company = () => {
+const closeModal = () => {
+  openDialog.value = false
+  companyEdited.value = null
+  getCompanies()
+}
+
+const deleteCompany = () => {
 
 }
 
-const edit_company = () => {
-
+const editCompany = (company) => {
+  companyEdited.value = company
+  openDialog.value = true
 }
 
 onMounted(() => {
-  company_list()
+  getCompanies()
 })
 </script>
 
@@ -78,12 +86,12 @@ onMounted(() => {
         :config="config"
         :data="companies.data"
         :pagination="companies.meta"
-        @page-change="company_list"
-        @on-delete="delete_company"
-        @on-edit="edit_company"
+        @page-change="getCompanies"
+        @on-delete="deleteCompany"
+        @on-edit="editCompany"
     />
 
-    <company-form-modal :is-open="openDialog"/>
+    <company-form-modal :is-open="openDialog" @close="closeModal" :company="companyEdited"/>
 
 
   </div>
